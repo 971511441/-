@@ -5,6 +5,7 @@ interface NameEntry {
   meaning: string;
   score: number;
   analysis?: string;
+  tagline?: string;
 }
 
 interface GenerateInput {
@@ -88,11 +89,11 @@ export async function generateCompanyNames(
 }
 
 function parseNameResponse(response: string): NameEntry[] {
-  const jsonStr = response.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+  const jsonStr = response.replace(/```json\r?\n?/g, "").replace(/```\r?\n?/g, "").trim();
   try {
     return JSON.parse(jsonStr);
   } catch {
-    const match = jsonStr.match(/\[[\s\S]*\]/);
+    const match = jsonStr.match(/\[[\s\S]*?\]/);
     if (match) return JSON.parse(match[0]);
     throw new Error(`Failed to parse name response: ${response.slice(0, 200)}`);
   }
