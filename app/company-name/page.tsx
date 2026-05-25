@@ -48,6 +48,7 @@ export default function CompanyNamePage() {
         <>
           <NameResults names={names} isPaid={false} />
           <Paywall
+            type="company"
             onUnlock={() => {
               window.location.href = "/pay/create?type=company";
             }}

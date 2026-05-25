@@ -48,6 +48,7 @@ export default function BabyNamePage() {
         <>
           <NameResults names={names} isPaid={false} />
           <Paywall
+            type="baby"
             onUnlock={() => {
               window.location.href = "/pay/create?type=baby";
             }}
