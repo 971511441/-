@@ -1,0 +1,19 @@
+name: Daily SEO Content Generation
+on:
+  schedule:
+    - cron: "0 1 * * *"  # 9:00 AM Beijing time = 1:00 UTC
+  workflow_dispatch:      # Manual trigger
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci
+      - run: npx tsx scripts/seo-generate.ts 10
+        env:
+          ADMIN_SECRET_KEY: ${{ secrets.ADMIN_SECRET_KEY }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
