@@ -20,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <body className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex flex-col">
+      <body className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex flex-col text-gray-800">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
