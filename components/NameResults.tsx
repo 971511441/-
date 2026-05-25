@@ -1,10 +1,4 @@
-interface NameEntry {
-  name: string;
-  meaning: string;
-  score: number;
-  analysis?: string;
-  tagline?: string;
-}
+import { NameEntry } from "@/lib/types";
 
 interface NameResultsProps {
   names: NameEntry[];

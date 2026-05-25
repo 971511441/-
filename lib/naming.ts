@@ -1,12 +1,5 @@
 import { chat } from "./deepseek";
-
-interface NameEntry {
-  name: string;
-  meaning: string;
-  score: number;
-  analysis?: string;
-  tagline?: string;
-}
+import { NameEntry } from "./types";
 
 interface GenerateInput {
   surname: string;
