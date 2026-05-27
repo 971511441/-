@@ -15,7 +15,7 @@ interface CompanyParams {
   style: string;
 }
 
-type GenerateParams = { type: "baby" } & BabyParams | { type: "company" } & CompanyParams;
+export type GenerateParams = { type: "baby" } & BabyParams | { type: "company" } & CompanyParams;
 
 interface NameFormProps {
   type: "baby" | "company";

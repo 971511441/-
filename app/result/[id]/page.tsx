@@ -28,8 +28,8 @@ export default function ResultPage({ params }: { params: { id: string } }) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         setNames(data.names);
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "加载失败");
       } finally {
         setLoading(false);
       }

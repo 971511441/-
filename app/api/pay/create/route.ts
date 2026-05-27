@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const order = await createOrder({
-      amount: 1990, // 19.90 RMB in cents
+      amount: 1990,
       productName: type === "baby" ? "宝宝起名-深度分析" : "公司起名-深度分析",
       outTradeNo,
     });
@@ -38,8 +38,8 @@ export async function POST(req: NextRequest) {
       payUrl: order.pay_url,
       qrcodeUrl: order.qrcode_url || null,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Payment create error:", error);
-    return NextResponse.json({ error: error.message || "创建订单失败" }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "创建订单失败" }, { status: 500 });
   }
 }

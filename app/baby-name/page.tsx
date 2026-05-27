@@ -1,16 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { NameForm } from "@/components/NameForm";
+import { useState, useRef, useCallback } from "react";
+import { NameForm, type GenerateParams } from "@/components/NameForm";
 import { NameResults } from "@/components/NameResults";
 import { Paywall } from "@/components/Paywall";
+import type { NameEntry } from "@/lib/types";
 
 export default function BabyNamePage() {
-  const [names, setNames] = useState<any[]>([]);
+  const [names, setNames] = useState<NameEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isPaid, setIsPaid] = useState(false);
+  const lastParams = useRef<GenerateParams | null>(null);
 
-  const handleGenerate = async (params: any) => {
+  const handleGenerate = async (params: GenerateParams) => {
+    lastParams.current = params;
     setLoading(true);
     setError("");
     try {
@@ -22,12 +26,40 @@ export default function BabyNamePage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setNames(data.names);
-    } catch (e: any) {
-      setError(e.message);
+      setIsPaid(false);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "生成失败");
     } finally {
       setLoading(false);
     }
   };
+
+  const handlePaid = useCallback(async () => {
+    if (!lastParams.current) return;
+
+    setLoading(true);
+    setError("");
+
+    const paidOrders: string[] = JSON.parse(localStorage.getItem("paidOrders") || "[]");
+    const orderId = paidOrders[paidOrders.length - 1];
+    if (!orderId) return;
+
+    try {
+      const res = await fetch("/api/generate-paid", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...lastParams.current, orderId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setNames(data.names);
+      setIsPaid(true);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "生成失败");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -35,7 +67,9 @@ export default function BabyNamePage() {
         宝宝起名
       </h1>
       <p className="text-center text-gray-500 mb-8">
-        免费生成10个名字，付费解锁50个名字 + 详细寓意分析
+        {isPaid
+          ? "已解锁全部50个名字 + 完整分析"
+          : "免费生成10个名字，付费解锁50个名字 + 详细寓意分析"}
       </p>
 
       <NameForm type="baby" onGenerate={handleGenerate} loading={loading} />
@@ -46,13 +80,10 @@ export default function BabyNamePage() {
 
       {names.length > 0 && (
         <>
-          <NameResults names={names} isPaid={false} />
-          <Paywall
-            type="baby"
-            onUnlock={() => {
-              window.location.href = "/pay/create?type=baby";
-            }}
-          />
+          <NameResults names={names} isPaid={isPaid} />
+          {!isPaid && (
+            <Paywall type="baby" onPaid={handlePaid} />
+          )}
         </>
       )}
     </div>

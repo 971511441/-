@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getOrder, updateOrder } from "@/lib/storage";
+import { getOrder, updateOrderResult } from "@/lib/orders";
 import { generateBabyNames, generateCompanyNames } from "@/lib/naming";
+import type { NameEntry } from "@/lib/types";
 
 export async function POST(req: NextRequest) {
   let body;
@@ -26,11 +27,12 @@ export async function POST(req: NextRequest) {
 
   // Return cached result if already generated
   if (order.result) {
-    return NextResponse.json({ names: order.result });
+    return NextResponse.json({ names: order.result as NameEntry[] });
   }
 
   try {
     let names;
+    console.log("generate-paid: starting generation, type:", order.type);
     if (order.type === "baby") {
       names = await generateBabyNames({
         surname: surname || "张",
@@ -47,8 +49,9 @@ export async function POST(req: NextRequest) {
         50
       );
     }
+    console.log("generate-paid: success, got", names?.length, "names");
 
-    updateOrder(orderId, { result: names });
+    updateOrderResult(orderId, names);
     return NextResponse.json({ names });
   } catch (error) {
     console.error("Paid generation error:", error);

@@ -23,7 +23,7 @@ export function NameResults({ names, isPaid }: NameResultsProps) {
           </div>
           <p className="text-sm text-gray-600 leading-relaxed">{entry.meaning}</p>
           {entry.tagline && (
-            <p className="mt-2 text-sm text-gray-500 italic">"{entry.tagline}"</p>
+            <p className="mt-2 text-sm text-gray-500 italic">「{entry.tagline}」</p>
           )}
           {isPaid && entry.analysis && (
             <div className="mt-3 pt-3 border-t border-gray-100">

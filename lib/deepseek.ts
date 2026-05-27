@@ -16,7 +16,7 @@ export async function chat(
   options?: { temperature?: number; max_tokens?: number }
 ): Promise<string> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30_000);
+  const timeout = setTimeout(() => controller.abort(), 90_000);
 
   try {
     const res = await fetch(`${DEEPSEEK_BASE_URL}/v1/chat/completions`, {
@@ -26,10 +26,10 @@ export async function chat(
         Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "deepseek-chat",
+        model: "deepseek-v4-flash",
         messages,
         temperature: options?.temperature ?? 0.9,
-        max_tokens: options?.max_tokens ?? 2000,
+        max_tokens: options?.max_tokens ?? 4000,
       }),
       signal: controller.signal,
     });

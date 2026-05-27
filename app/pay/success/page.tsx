@@ -1,10 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export default function PaySuccessPage() {
+function PaySuccessContent() {
   const params = useSearchParams();
   const orderId = params.get("order");
   const [status, setStatus] = useState<string>("checking");
@@ -57,5 +58,13 @@ export default function PaySuccessPage() {
         <div className="animate-pulse text-gray-400">确认支付状态中...</div>
       )}
     </div>
+  );
+}
+
+export default function PaySuccessPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-16 text-gray-400">加载中...</div>}>
+      <PaySuccessContent />
+    </Suspense>
   );
 }

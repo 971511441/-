@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
+import { PayModal } from "./PayModal";
+
 interface PaywallProps {
   type: "baby" | "company";
-  onUnlock: () => void;
+  onPaid: () => void;
 }
 
 const content = {
@@ -39,27 +42,38 @@ const colorMap = {
   },
 };
 
-export function Paywall({ type, onUnlock }: PaywallProps) {
+export function Paywall({ type, onPaid }: PaywallProps) {
+  const [showModal, setShowModal] = useState(false);
   const c = content[type];
   const cl = colorMap[c.color];
 
   return (
-    <div className={`mt-8 p-6 rounded-2xl bg-gradient-to-r ${cl.gradient} border ${cl.border} text-center`}>
-      <h3 className={`text-xl font-bold ${cl.title} mb-2`}>
-        {c.title}
-      </h3>
-      <p className={`${cl.text} mb-4`}>
-        {c.features}
-      </p>
-      <button
-        onClick={onUnlock}
-        className={`px-8 py-3 ${cl.button} text-white rounded-full font-bold transition shadow-lg`}
-      >
-        仅需19.9元 · 立即解锁
-      </button>
-      <p className={`text-xs ${cl.note} mt-2`}>
-        {c.note}
-      </p>
-    </div>
+    <>
+      <div className={`mt-8 p-6 rounded-2xl bg-gradient-to-r ${cl.gradient} border ${cl.border} text-center`}>
+        <h3 className={`text-xl font-bold ${cl.title} mb-2`}>
+          {c.title}
+        </h3>
+        <p className={`${cl.text} mb-4`}>
+          {c.features}
+        </p>
+        <button
+          onClick={() => setShowModal(true)}
+          className={`px-8 py-3 ${cl.button} text-white rounded-full font-bold transition shadow-lg`}
+        >
+          仅需19.9元 · 立即解锁
+        </button>
+        <p className={`text-xs ${cl.note} mt-2`}>
+          {c.note}
+        </p>
+      </div>
+
+      {showModal && (
+        <PayModal
+          type={type}
+          onClose={() => setShowModal(false)}
+          onPaid={onPaid}
+        />
+      )}
+    </>
   );
 }
