@@ -135,38 +135,43 @@ function buildCompanyPrompt(industry: string, keywords: string, style: string, c
 只返回JSON数组，不要其他内容。`;
 }
 
+async function runBatch(input: GenerateInput, batchIndex: number, batchCount: number): Promise<NameEntry[]> {
+  const prompt = buildBabyPrompt(input);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const response = await chat(
+        [
+          { role: "system", content: "你是一位专业的起名专家，精通诗经楚辞、八字五行和现代取名。只返回JSON数组。" },
+          { role: "user", content: prompt },
+        ],
+        { max_tokens: 4000 }
+      );
+      const names = parseNameResponse(response);
+      console.log(`generate-paid: batch ${batchIndex}/${batchCount} done, got ${names.length} names`);
+      return names;
+    } catch (e) {
+      console.error(`generate-paid: batch ${batchIndex}/${batchCount} attempt ${attempt + 1} failed:`, e);
+      if (attempt === 1) throw e;
+    }
+  }
+  return [];
+}
+
 export async function generateBabyNames(input: GenerateInput): Promise<NameEntry[]> {
   const totalCount = input.count;
   const batchSize = 10;
   const batchCount = Math.ceil(totalCount / batchSize);
-  const allNames: NameEntry[] = [];
 
-  console.log(`generate-paid: splitting ${totalCount} names into ${batchCount} batches of ${batchSize}`);
+  console.log(`generate-paid: splitting ${totalCount} names into ${batchCount} batches of ${batchSize} (parallel)`);
 
+  const batchPromises: Promise<NameEntry[]>[] = [];
   for (let i = 0; i < batchCount; i++) {
     const batchInput = { ...input, count: batchSize };
-    const prompt = buildBabyPrompt(batchInput);
-    // Retry up to 2 times on parse failure
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        const response = await chat(
-          [
-            { role: "system", content: "你是一位专业的起名专家，精通诗经楚辞、八字五行和现代取名。只返回JSON数组。" },
-            { role: "user", content: prompt },
-          ],
-          { max_tokens: 4000 }
-        );
-        const names = parseNameResponse(response);
-        allNames.push(...names);
-        console.log(`generate-paid: batch ${i + 1}/${batchCount} done, got ${names.length} names`);
-        break;
-      } catch (e) {
-        console.error(`generate-paid: batch ${i + 1}/${batchCount} attempt ${attempt + 1} failed:`, e);
-        if (attempt === 1) throw e;
-      }
-    }
+    batchPromises.push(runBatch(batchInput, i + 1, batchCount));
   }
 
+  const results = await Promise.all(batchPromises);
+  const allNames = results.flat();
   return allNames.slice(0, totalCount);
 }
 
@@ -178,11 +183,10 @@ export async function generateCompanyNames(
 ): Promise<NameEntry[]> {
   const batchSize = 10;
   const batchCount = Math.ceil(count / batchSize);
-  const allNames: NameEntry[] = [];
 
-  console.log(`generate-paid: splitting ${count} names into ${batchCount} batches of ${batchSize}`);
+  console.log(`generate-paid: splitting ${count} names into ${batchCount} batches of ${batchSize} (parallel)`);
 
-  for (let i = 0; i < batchCount; i++) {
+  async function runCompanyBatch(batchIndex: number): Promise<NameEntry[]> {
     const prompt = buildCompanyPrompt(industry, keywords, style, batchSize);
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
@@ -194,17 +198,23 @@ export async function generateCompanyNames(
           { max_tokens: 4000 }
         );
         const names = parseNameResponse(response);
-        allNames.push(...names);
-        console.log(`generate-paid: batch ${i + 1}/${batchCount} done, got ${names.length} names`);
-        break;
+        console.log(`generate-paid: batch ${batchIndex}/${batchCount} done, got ${names.length} names`);
+        return names;
       } catch (e) {
-        console.error(`generate-paid: batch ${i + 1}/${batchCount} attempt ${attempt + 1} failed:`, e);
+        console.error(`generate-paid: batch ${batchIndex}/${batchCount} attempt ${attempt + 1} failed:`, e);
         if (attempt === 1) throw e;
       }
     }
+    return [];
   }
 
-  return allNames.slice(0, count);
+  const batchPromises: Promise<NameEntry[]>[] = [];
+  for (let i = 0; i < batchCount; i++) {
+    batchPromises.push(runCompanyBatch(i + 1));
+  }
+
+  const results = await Promise.all(batchPromises);
+  return results.flat().slice(0, count);
 }
 
 function parseNameResponse(response: string): NameEntry[] {
