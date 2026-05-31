@@ -91,8 +91,16 @@ export default function BabyNamePage() {
         <div className="mt-6 text-center py-8 px-4 bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50 rounded-2xl border border-pink-100/50">
           <div className="text-4xl mb-3">🔮</div>
           <p className="text-rose-600 font-semibold mb-2">正在逐个推敲名字...</p>
-          <p className="text-sm text-rose-400">40 个名字逐一分析字义、五行、八字契合度</p>
-          <p className="text-xs text-rose-300 mt-2">预计 2-3 分钟，建议先去倒杯水 🍵</p>
+          <p className="text-sm text-rose-400">
+            {isPaid
+              ? "40 个名字逐一分析字义、五行、八字契合度"
+              : "10 个名字逐一分析字义"}
+          </p>
+          <p className="text-xs text-rose-300 mt-2">
+            {isPaid
+              ? "预计 2-3 分钟，建议先去倒杯水 🍵"
+              : "预计 30 秒，建议先去倒杯水 🍵"}
+          </p>
           <div className="mt-4 flex justify-center">
             <div className="w-32 h-1.5 bg-rose-100 rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-rose-400 to-amber-400 rounded-full animate-pulse" style={{width: '60%'}} />
