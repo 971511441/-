@@ -136,15 +136,41 @@ function buildCompanyPrompt(industry: string, keywords: string, style: string, c
 }
 
 export async function generateBabyNames(input: GenerateInput): Promise<NameEntry[]> {
-  const prompt = buildBabyPrompt(input);
-  const response = await chat(
-    [
-      { role: "system", content: "你是一位专业的起名专家，精通诗经楚辞、八字五行和现代取名。只返回JSON数组。" },
-      { role: "user", content: prompt },
-    ],
-    { max_tokens: 8000 }
-  );
-  return parseNameResponse(response);
+  const totalCount = input.count;
+  const batchSize = 10;
+  const batchCount = Math.ceil(totalCount / batchSize);
+  const allNames: NameEntry[] = [];
+
+  console.log(`generate-paid: splitting ${totalCount} names into ${batchCount} batches of ${batchSize}`);
+
+  for (let i = 0; i < batchCount; i++) {
+    const batchInput = { ...input, count: batchSize };
+    const prompt = buildBabyPrompt(batchInput);
+    let lastError: unknown = null;
+
+    // Retry up to 2 times on parse failure
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const response = await chat(
+          [
+            { role: "system", content: "你是一位专业的起名专家，精通诗经楚辞、八字五行和现代取名。只返回JSON数组。" },
+            { role: "user", content: prompt },
+          ],
+          { max_tokens: 4000 }
+        );
+        const names = parseNameResponse(response);
+        allNames.push(...names);
+        console.log(`generate-paid: batch ${i + 1}/${batchCount} done, got ${names.length} names`);
+        break;
+      } catch (e) {
+        lastError = e;
+        console.error(`generate-paid: batch ${i + 1}/${batchCount} attempt ${attempt + 1} failed:`, e);
+        if (attempt === 1) throw e;
+      }
+    }
+  }
+
+  return allNames.slice(0, totalCount);
 }
 
 export async function generateCompanyNames(
@@ -153,15 +179,38 @@ export async function generateCompanyNames(
   style: string,
   count: number
 ): Promise<NameEntry[]> {
-  const prompt = buildCompanyPrompt(industry, keywords, style, count);
-  const response = await chat(
-    [
-      { role: "system", content: "你是一位专业的品牌命名顾问，熟悉商标法和域名注册。只返回JSON数组。" },
-      { role: "user", content: prompt },
-    ],
-    { max_tokens: 8000 }
-  );
-  return parseNameResponse(response);
+  const batchSize = 10;
+  const batchCount = Math.ceil(count / batchSize);
+  const allNames: NameEntry[] = [];
+
+  console.log(`generate-paid: splitting ${count} names into ${batchCount} batches of ${batchSize}`);
+
+  for (let i = 0; i < batchCount; i++) {
+    const prompt = buildCompanyPrompt(industry, keywords, style, batchSize);
+    let lastError: unknown = null;
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const response = await chat(
+          [
+            { role: "system", content: "你是一位专业的品牌命名顾问，熟悉商标法和域名注册。只返回JSON数组。" },
+            { role: "user", content: prompt },
+          ],
+          { max_tokens: 4000 }
+        );
+        const names = parseNameResponse(response);
+        allNames.push(...names);
+        console.log(`generate-paid: batch ${i + 1}/${batchCount} done, got ${names.length} names`);
+        break;
+      } catch (e) {
+        lastError = e;
+        console.error(`generate-paid: batch ${i + 1}/${batchCount} attempt ${attempt + 1} failed:`, e);
+        if (attempt === 1) throw e;
+      }
+    }
+  }
+
+  return allNames.slice(0, count);
 }
 
 function parseNameResponse(response: string): NameEntry[] {

@@ -16,7 +16,7 @@ export async function chat(
   options?: { temperature?: number; max_tokens?: number }
 ): Promise<string> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 90_000);
+  const timeout = setTimeout(() => controller.abort(), 120_000);
 
   try {
     const res = await fetch(`${DEEPSEEK_BASE_URL}/v1/chat/completions`, {
