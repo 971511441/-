@@ -31,8 +31,8 @@ yarn-error.log*
 # vercel
 .vercel
 
-# data directory (orders, articles, etc.)
-/data
+# data files (orders should not be committed)
+/data/orders.json
 
 # typescript
 *.tsbuildinfo
