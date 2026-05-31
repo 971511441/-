@@ -159,7 +159,7 @@ async function runBatch(input: GenerateInput, batchIndex: number, batchCount: nu
 
 export async function generateBabyNames(input: GenerateInput): Promise<NameEntry[]> {
   const totalCount = input.count;
-  const batchSize = 10;
+  const batchSize = 5;
   const batchCount = Math.ceil(totalCount / batchSize);
 
   console.log(`generate-paid: splitting ${totalCount} names into ${batchCount} batches of ${batchSize} (parallel)`);
@@ -181,7 +181,7 @@ export async function generateCompanyNames(
   style: string,
   count: number
 ): Promise<NameEntry[]> {
-  const batchSize = 10;
+  const batchSize = 5;
   const batchCount = Math.ceil(count / batchSize);
 
   console.log(`generate-paid: splitting ${count} names into ${batchCount} batches of ${batchSize} (parallel)`);
