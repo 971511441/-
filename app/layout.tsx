@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <head>
-        <meta name="baidu-site-verification" content="codeva-I2ZpTsqES6" />
+        <meta name="baidu-site-verification" content="codeva-qUdkx5zPoi" />
         <meta name="baidu_union_verify" content="REPLACE_WITH_YOUR_CODE" />
       </head>
       <body className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex flex-col text-gray-800">
