@@ -146,8 +146,6 @@ export async function generateBabyNames(input: GenerateInput): Promise<NameEntry
   for (let i = 0; i < batchCount; i++) {
     const batchInput = { ...input, count: batchSize };
     const prompt = buildBabyPrompt(batchInput);
-    let lastError: unknown = null;
-
     // Retry up to 2 times on parse failure
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
@@ -163,7 +161,6 @@ export async function generateBabyNames(input: GenerateInput): Promise<NameEntry
         console.log(`generate-paid: batch ${i + 1}/${batchCount} done, got ${names.length} names`);
         break;
       } catch (e) {
-        lastError = e;
         console.error(`generate-paid: batch ${i + 1}/${batchCount} attempt ${attempt + 1} failed:`, e);
         if (attempt === 1) throw e;
       }
@@ -187,8 +184,6 @@ export async function generateCompanyNames(
 
   for (let i = 0; i < batchCount; i++) {
     const prompt = buildCompanyPrompt(industry, keywords, style, batchSize);
-    let lastError: unknown = null;
-
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
         const response = await chat(
@@ -203,7 +198,6 @@ export async function generateCompanyNames(
         console.log(`generate-paid: batch ${i + 1}/${batchCount} done, got ${names.length} names`);
         break;
       } catch (e) {
-        lastError = e;
         console.error(`generate-paid: batch ${i + 1}/${batchCount} attempt ${attempt + 1} failed:`, e);
         if (attempt === 1) throw e;
       }
