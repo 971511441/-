@@ -20,7 +20,7 @@ export default function AboutPage() {
           <li>AI生成速度快，10秒内提供10个优质名字</li>
           <li>覆盖多种风格：诗经古风、楚辞浪漫、现代简约</li>
           <li>每个名字附带详细寓意解释和评分</li>
-          <li>付费用户享受50个名字+八字五行分析+重名度评估</li>
+          <li>付费用户享受40个名字+八字五行分析+重名度评估</li>
         </ul>
         <h2 className="text-xl font-semibold text-gray-800 mt-6 mb-2">联系我们</h2>
         <p>如有问题或建议，欢迎通过网站留言或邮件联系我们。</p>

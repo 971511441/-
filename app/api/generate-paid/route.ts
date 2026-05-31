@@ -39,14 +39,14 @@ export async function POST(req: NextRequest) {
         gender: gender || "unknown",
         birthDate,
         style: style || "现代",
-        count: 50,
+        count: 40,
       });
     } else {
       names = await generateCompanyNames(
         industry || "互联网",
         keywords || "",
         style || "科技感",
-        50
+        40
       );
     }
     console.log("generate-paid: success, got", names?.length, "names");

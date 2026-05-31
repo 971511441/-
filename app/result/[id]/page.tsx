@@ -60,7 +60,7 @@ export default function ResultPage({ params }: { params: { id: string } }) {
         你的专属起名结果
       </h1>
       <p className="text-center text-gray-500 mb-8">
-        AI为你生成了50个优质名字，包含详细寓意分析。可分享此页面给家人一起讨论。
+        AI为你生成了40个优质名字，包含详细寓意分析。可分享此页面给家人一起讨论。
       </p>
       <NameResults names={names} isPaid={true} />
       <div className="mt-8 text-center">

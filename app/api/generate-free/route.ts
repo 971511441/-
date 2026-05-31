@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateBabyNames, generateCompanyNames } from "@/lib/naming";
+import { generateBabyNamesFree, generateCompanyNamesFree } from "@/lib/naming";
 import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     let names;
     if (type === "baby") {
       const safeSurname = sanitize(surname, 4) || "张";
-      names = await generateBabyNames({
+      names = await generateBabyNamesFree({
         surname: safeSurname,
         gender: gender || "unknown",
         birthDate: sanitize(birthDate || "", 20),
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
         count: 10,
       });
     } else if (type === "company") {
-      names = await generateCompanyNames(
+      names = await generateCompanyNamesFree(
         sanitize(industry || "互联网", 50),
         sanitize(keywords || "", 50),
         sanitize(style || "科技感", 20),
