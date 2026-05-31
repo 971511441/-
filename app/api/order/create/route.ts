@@ -12,7 +12,8 @@ export async function POST(req: NextRequest) {
       orderId: order.id,
       amount: order.amount,
     });
-  } catch {
+  } catch (e) {
+    console.error("[order/create] Error:", e);
     return NextResponse.json({ error: "创建订单失败" }, { status: 500 });
   }
 }

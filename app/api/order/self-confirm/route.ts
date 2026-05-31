@@ -5,7 +5,8 @@ export async function POST(req: NextRequest) {
   let body;
   try {
     body = await req.json();
-  } catch {
+  } catch (e) {
+    console.error("[order/self-confirm] Body parse error:", e);
     return NextResponse.json({ error: "请求格式错误" }, { status: 400 });
   }
 
