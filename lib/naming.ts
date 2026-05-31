@@ -221,6 +221,7 @@ function parseNameResponse(response: string): NameEntry[] {
   const jsonStr = response
     .replace(/```json\r?\n?/g, "")
     .replace(/```\r?\n?/g, "")
+    .replace(/[ -]/g, " ")
     .trim();
   try {
     return JSON.parse(jsonStr);
