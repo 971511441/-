@@ -100,12 +100,12 @@ function buildBabyPrompt(input: GenerateInput): string {
 返回JSON数组格式，每个名字包含以下字段：
 
 - name: 完整姓名（含姓氏）
-- meaning: 名字寓意（50-70字，解释每个字的含义和整体传达的美好愿景）
-- score: 综合评分（1-100，基于音韵、寓意、文化底蕴、与八字的契合度综合判断）
-- analysis: 字义拆解（40-60字，分别解释每个字的五行属性和搭配理由）
-${input.birthDate ? "- bazi: 八字五行分析（基于出生日期推算八字五行，分析这个名字为什么与宝宝的命理契合或互补。如无法精确推算请标注「基于出生日期推算，仅供参考」）" : "- bazi: 名字的五行属性分析（分析名字用字的五行归属，说明适合什么命理的宝宝）"}
-- popularity: 重名度评估（「较低 / 中等 / 较高」+ 一句话理由，如「语瑶」近年热度上升但尚未泛滥）
-- nickname: 小名推荐（1-2个亲昵顺口的小名，如「小禾」「安安」）
+- meaning: 名字寓意（40-50字，解释字义和整体愿景）
+- score: 综合评分（1-100）
+- analysis: 字义拆解（30-40字，五行属性和搭配理由）
+${input.birthDate ? "- bazi: 八字简析（30-40字，基于出生日期的五行分析，标注「仅供参考」）" : "- bazi: 五行属性（20字内）"}
+- popularity: 重名度（「较低/中等/较高」+ 简短理由）
+- nickname: 小名推荐（1-2个）
 
 只返回JSON数组，不要其他内容。`;
 }
@@ -125,12 +125,12 @@ function buildCompanyPrompt(industry: string, keywords: string, style: string, c
 
 返回JSON数组，每个名字包含以下字段：
 
-- name: 品牌名（2-4个字，好记好传播）
-- meaning: 命名寓意（50-70字，解释品牌联想和行业契合度）
-- score: 综合评分（1-100，基于传播力、行业契合度、商标显著性、域名友好度综合判断）
-- tagline: 一句品牌口号（8-15字，有记忆点）
-- trademark: 商标可注册性分析（40-60字。判断显著性和近似风险，标注「基于名称特征分析，最终以商标局审查为准」）
-- domain: 域名建议（推荐1-2个可能可注册的域名格式，如「hechuang.com」「hechuang.cn」，标注「建议在域名注册平台查询实际可用性」）
+- name: 品牌名（2-4个字）
+- meaning: 命名寓意（40-50字）
+- score: 综合评分（1-100）
+- tagline: 品牌口号（8-12字）
+- trademark: 商标分析（30-40字，显著性+近似风险，标注「以商标局审查为准」）
+- domain: 域名建议（1-2个，标注「以注册平台查询为准」）
 
 只返回JSON数组，不要其他内容。`;
 }
@@ -221,7 +221,7 @@ function parseNameResponse(response: string): NameEntry[] {
   const jsonStr = response
     .replace(/```json\r?\n?/g, "")
     .replace(/```\r?\n?/g, "")
-    .replace(/[ -]/g, " ")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "")
     .trim();
   try {
     return JSON.parse(jsonStr);
